@@ -1,0 +1,150 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import metrics
+import matplotlib.pyplot as pt
+import csv
+import os
+print(os.listdir("../input"))
+import warnings
+warnings.filterwarnings('ignore')
+print("Warnings ignored!!")
+data1=np.load("../input/pal-faces/features.npy")
+print("data[0]\n",data1[0]) #The datat for the first image
+#print("\n\ndata:-\n",data)  #All data
+print("\nThere are {} images in the dataset".format(len(data1)))
+print("Size of each image is {}x{}".format(data1.shape[1],data1.shape[2]))
+#print("Pixel values were scaled to [0,1] interval. e.g:{}".format(data[0][0,:4]))
+
+target=[]
+data=[]
+
+with open('../input/pal-target/pal_target.csv') as csvDataFile:
+    csvReader = csv.reader(csvDataFile)
+    for row in csvReader:
+        target.append(row)
+    
+target=np.array(target)
+target=target.reshape(-1)
+data=np.array(data1)
+data = np.reshape(data, (100,180,192))
+print("target shape",target.shape)
+print("data shape",data.shape)
+
+target[0]=0
+target = target.astype(int)
+
+print("target:\n:",target)
+if data[10] in data:
+    print("it is exisiting in data")
+else:
+    print("it is not existing in data")
+    
+    if 39 in target:
+    print("39 is exisiting in target")
+else:
+    print("39 is not existing in target")
+    
+    data2=np.load("../input/man1-rbg/man1_features.npy")
+man_data=[]
+man_data=np.array(data2)
+man_data = np.reshape(data2, (100,8,24))
+
+
+arr=[data[0],data[1],man_data,data[3]]
+def exisiting_data_or_not(input_data):
+    count=0
+    for n in input_data:
+        count=count+1
+        if n in data:
+            print(count,"is exisiting in data")
+        else:
+            print(count,"is not existing in data")
+exisiting_data_or_not(arr) 
+
+#We reshape images for machine learnig  model
+X = np.reshape(data, (180,19200))
+#X=data.reshape((data.shape[0],data.shape[1]*data.shape[2]))
+print("X shape:",X.shape)
+print(X[:3,:])
+
+X_train, X_test, y_train, y_test=train_test_split(X, target, test_size=0.3, stratify=target, random_state=0)
+print("X_train shape:",X_train.shape) 
+print("y_train shape:{}".format(y_train.shape))
+
+#KNeighbor
+from sklearn.neighbors import KNeighborsClassifier
+classifier = KNeighborsClassifier(n_neighbors =5)     #change number...5 is the best
+classifier.fit(X_train, y_train)
+y_pred = classifier.predict(X_test)
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+result = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(result)
+result1 = classification_report(y_test, y_pred)
+print("Classification Report:",)
+print (result1)
+result2 = accuracy_score(y_test,y_pred)
+print("Accuracy:",result2*100,'%')
+print("\nX_test shape: ",X_test.shape)
+print("\nx_test:\n ",X_test)
+
+print("\npredict(X_test): \n",y_pred,"\n shape for X_test",X_test.shape)
+
+#naive_bayes,GaussianNB
+GNBModel = GaussianNB()
+GNBModel.fit(X_train, y_train) # Model Construction
+GNBpredict = GNBModel.predict(X_test) # Model Evaluation or Testing
+print('accuracy of GNBModel:', GNBModel.score(X_test, y_test)* 100, '%')
+
+#SVM_Model
+svmModel=SVC()
+svmModel.fit(X_train, y_train) # Model Construction 
+predict = svmModel.predict(X_test) # Model Evaluation or Testing
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+print('Testing accuracy of svmModel:', svmModel.score(X_test, y_test)* 100, '%') # Accuracy
+print('Testing Accuracy Score\t', accuracy_score(y_test, predict))
+predict_train = svmModel.predict(X_train) # Model Evaluation against training data
+print('Training Accuracy Score\t', accuracy_score(y_train, predict_train))
+print('Testing confusion Matrix', confusion_matrix(y_test, predict))
+print('Training confusion Matrix', confusion_matrix(y_train, predict_train))
+print('Testing Classification Report:\n', classification_report(y_test, predict))
+print('Training Classification Report:\n', classification_report(y_train, predict_train))
+
+#Linear Regression
+from matplotlib import pyplot
+
+X, y = data[0], data[4] # split into inputs and outputs
+Z=data[1]
+print("this shape for relation between data[0] and the class")
+data_1 = X.reshape((len(X),192))
+pyplot.scatter(X, y) # scatter plot
+pyplot.show()
+print("this shape for relation between data[1] and the class")
+
+data_1 = Z.reshape((len(X),192))
+
+pyplot.scatter(Z, y) # scatter plot
+pyplot.show()
+print("this shape for relation between data[2] and the class")
+W=data[2]
+
+data_1 = W.reshape((len(X),192))
+
+pyplot.scatter(W, y) # scatter plot
+pyplot.show()
+print("this shape for relation between data[3] and the class")
+G=data[3]
+
+data_1 = G.reshape((len(X),192))
+
+pyplot.scatter(G, y) # scatter plot
+pyplot.show()
